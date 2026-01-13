@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Printed Smiles Co</title>
+  <style>
+    :root { --border:#e6e6e6; --text:#111; --muted:#666; }
+    body { font-family: Arial, sans-serif; margin: 0; color: var(--text); background:#fff; }
+    header { position: sticky; top: 0; background:#fff; border-bottom: 1px solid var(--border); }
+    .wrap { max-width: 980px; margin: 0 auto; padding: 16px; }
+    .topbar { display:flex; gap:10px; align-items:center; }
+    input[type="search"] { flex:1; padding: 10px 12px; border:1px solid var(--border); border-radius: 8px; font-size: 14px; }
+    button { padding: 10px 12px; border:1px solid var(--border); background:#fff; border-radius: 8px; cursor:pointer; }
+    button.primary { border-color:#111; }
+    .sub { margin-top:10px; color: var(--muted); font-size: 13px; display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+    .pill { border:1px solid var(--border); padding:6px 10px; border-radius: 999px; font-size: 12px; }
+    main { padding: 18px 0 40px; }
+    .grid { display:grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .card { border:1px solid var(--border); border-radius: 12px; padding: 14px; background:#fff; }
+    .card h3 { margin:0 0 6px; font-size: 16px; }
+    .meta { color: var(--muted); font-size: 12px; margin-bottom: 10px; }
+    .row { display:flex; justify-content: space-between; align-items:center; gap: 10px; }
+    a { color: inherit; text-decoration: none; }
+    a.link { text-decoration: underline; }
+    .stock { font-size: 12px; }
+    .stock.ok { color: #0a7a2f; }
+    .stock.no { color: #a10000; }
+
+    @media (max-width: 860px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 560px) { .grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="topbar">
+      <input id="search" type="search" placeholder="Search items…" />
+      <button class="primary" id="ageBtn">Age</button>
+    </div>
+    <div class="sub">
+      <span class="pill" id="agePill">Age: not set</span>
+      <span class="pill" id="countPill">0 items</span>
+      <span class="pill">Made on a Bambu Lab printer</span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="grid" id="grid"></div>
+</main>
+
+<script src="products.js"></script>
+<script>
+  const AGE_BUCKETS = [
+    { label: "3–6", min: 3, max: 6 },
+    { label: "7–9", min: 7, max: 9 },
+    { label: "10–11", min: 10, max: 11 },
+    { label: "13–14", min: 13, max: 14 },
+    { label: "15+", min: 15, max: 99 },
+  ];
+
+  const state = {
+    age: null,
+    q: ""
+  };
+
+  const grid = document.getElementById("grid");
+  const search = document.getElementById("search");
+  const ageBtn = document.getElementById("ageBtn");
+  const agePill = document.getElementById("agePill");
+  const countPill = document.getElementById("countPill");
+
+  function normalize(s){ return (s || "").toLowerCase().trim(); }
+
+  function matchesSearch(p, q){
+    if(!q) return true;
+    const hay = normalize([p.name, p.desc, (p.tags||[]).join(" ")].join(" "));
+    return hay.includes(q);
+  }
+
+  function matchesAge(p, age){
+    if(age === null) return true; // before age is set, show all
+    return age >= p.minAge && age <= p.maxAge;
+  }
+
+  function setAgePill(){
+    if(state.age === null) agePill.textContent = "Age: not set";
+    else agePill.textContent = `Age: ${state.age}`;
+  }
+
+  function render(){
+    const q = normalize(state.q);
+    const items = window.PRODUCTS.filter(p => matchesAge(p, state.age) && matchesSearch(p, q));
+
+    grid.innerHTML = items.map(p => {
+      const stockClass = p.inStock ? "ok" : "no";
+      const stockText = p.inStock ? "In Stock" : "Out of Stock";
+      const ageRange = `${p.minAge}–${p.maxAge === 99 ? "+" : p.maxAge}`;
+      const url = `product.html?id=${encodeURIComponent(p.id)}&age=${encodeURIComponent(state.age ?? "")}`;
+      return `
+        <div class="card">
+          <a href="${url}">
+            <h3>${p.name}</h3>
+            <div class="meta">Ages ${ageRange}</div>
+            <div class="row">
+              <span class="stock ${stockClass}">${stockText}</span>
+              <span class="link">View</span>
+            </div>
+          </a>
+        </div>
+      `;
+    }).join("");
+
+    countPill.textContent = `${items.length} item${items.length === 1 ? "" : "s"}`;
+  }
+
+  search.addEventListener("input", (e) => {
+    state.q = e.target.value;
+    render();
+  });
+
+  ageBtn.addEventListener("click", () => {
+    const input = prompt("Enter your age (number):");
+    if(input === null) return;
+    const age = parseInt(input, 10);
+    if(Number.isNaN(age) || age < 1 || age > 120){
+      alert("Please enter a real age number.");
+      return;
+    }
+    state.age = age;
+    setAgePill();
+    render();
+  });
+
+  // initial
+  setAgePill();
+  render();
+</script>
+</body>
+</html>
