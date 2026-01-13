@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Item – Printed Smiles Co</title>
+  <style>
+    :root { --border:#e6e6e6; --text:#111; --muted:#666; }
+    body { font-family: Arial, sans-serif; margin: 0; color: var(--text); background:#fff; }
+    header { border-bottom: 1px solid var(--border); }
+    .wrap { max-width: 860px; margin: 0 auto; padding: 16px; }
+    a { color: inherit; }
+    .card { border:1px solid var(--border); border-radius: 12px; padding: 16px; }
+    .muted { color: var(--muted); }
+    .row { display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top: 14px; }
+    button { padding: 10px 12px; border:1px solid var(--border); background:#fff; border-radius: 8px; cursor:pointer; }
+    button.primary { border-color:#111; }
+    .stock { font-size: 14px; }
+    .ok { color:#0a7a2f; }
+    .no { color:#a10000; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <a href="/">← Back</a>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="card">
+    <h1 id="name">Item</h1>
+    <p class="muted" id="ageRange"></p>
+    <p id="desc"></p>
+    <p class="stock" id="stock"></p>
+
+    <div class="row">
+      <button id="buyBtn" class="primary">Buy</button>
+      <span class="muted">Orders go to our email inbox.</span>
+    </div>
+  </div>
+</main>
+
+<script src="products.js"></script>
+<script>
+  const params = new URLSearchParams(location.search);
+  const id = params.get("id");
+  const ageFromHome = params.get("age"); // may be blank
+
+  const p = (window.PRODUCTS || []).find(x => x.id === id);
+
+  const nameEl = document.getElementById("name");
+  const ageEl = document.getElementById("ageRange");
+  const descEl = document.getElementById("desc");
+  const stockEl = document.getElementById("stock");
+  const buyBtn = document.getElementById("buyBtn");
+
+  if(!p){
+    nameEl.textContent = "Item not found";
+    ageEl.textContent = "";
+    descEl.textContent = "Go back and choose an item.";
+    stockEl.textContent = "";
+    buyBtn.disabled = true;
+  } else {
+    nameEl.textContent = p.name;
+    const range = `${p.minAge}–${p.maxAge === 99 ? "+" : p.maxAge}`;
+    ageEl.textContent = `Recommended ages: ${range}`;
+    descEl.textContent = p.desc || "";
+    stockEl.textContent = p.inStock ? "In Stock" : "Out of Stock";
+    stockEl.className = "stock " + (p.inStock ? "ok" : "no");
+
+    buyBtn.addEventListener("click", () => {
+      const age = ageFromHome || "";
+      const stock = p.inStock ? "In Stock" : "Out of Stock";
+      const url = `checkout.html?name=${encodeURIComponent(p.name)}&age=${encodeURIComponent(age)}&stock=${encodeURIComponent(stock)}`;
+      location.href = url;
+    });
+  }
+</script>
+
+</body>
+</html>
