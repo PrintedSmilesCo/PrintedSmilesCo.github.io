@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Checkout – Printed Smiles Co</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; max-width: 500px; margin: auto; }
+    h1 { text-align: center; }
+    label { display: block; margin-top: 15px; }
+    input, button { width: 100%; padding: 10px; margin-top: 5px; }
+    button { background: #4CAF50; color: white; border: none; font-size: 16px; cursor: pointer; }
+  </style>
+</head>
+<body>
+
+<h1>Checkout</h1>
+
+<form action="https://formspree.io/f/xgooelka" method="POST">
+
+  <!-- Customer info -->
+  <label>
+    Name
+    <input type="text" name="customer_name" required>
+  </label>
+
+  <label>
+    Address
+    <input type="text" name="address" required>
+  </label>
+
+  <label>
+    ZIP Code
+    <input type="text" name="zip" required pattern="[0-9]{5}">
+  </label>
+
+  <!-- Order info (filled automatically) -->
+  <input type="hidden" name="item_name" id="item_name">
+  <input type="hidden" name="customer_age" id="customer_age">
+  <input type="hidden" name="stock_status" id="stock_status">
+
+  <!-- Optional redirect after submit -->
+  <input type="hidden" name="_redirect" value="https://printedsmilesco.com/thanks.html">
+
+  <button type="submit">Buy</button>
+</form>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  document.getElementById("item_name").value = params.get("name") || "Unknown Item";
+  document.getElementById("customer_age").value = params.get("age") || "Not provided";
+  document.getElementById("stock_status").value = params.get("stock") || "In Stock";
+</script>
+
+</body>
+</html>
