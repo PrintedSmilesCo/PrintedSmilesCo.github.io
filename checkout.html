@@ -5,20 +5,28 @@
   <title>Checkout – Printed Smiles Co</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; max-width: 500px; margin: auto; }
-    h1 { text-align: center; }
-    label { display: block; margin-top: 15px; }
-    input, button { width: 100%; padding: 10px; margin-top: 5px; }
-    button { background: #4CAF50; color: white; border: none; font-size: 16px; cursor: pointer; }
+    body { font-family: Arial, sans-serif; padding: 20px; max-width: 620px; margin: auto; }
+    h1 { text-align: center; margin-bottom: 10px; }
+    .summary { border: 1px solid #e6e6e6; border-radius: 14px; padding: 14px; margin-bottom: 16px; background: #fff; }
+    .muted { color: #666; font-size: 13px; }
+    label { display: block; margin-top: 14px; font-weight: 700; font-size: 13px; }
+    input, textarea { width: 100%; padding: 10px; margin-top: 6px; border:1px solid #e6e6e6; border-radius: 10px; }
+    button { width: 100%; padding: 12px; margin-top: 16px; background: #111; color: white; border: none; font-size: 16px; border-radius: 12px; cursor: pointer; }
+    a { color: #111; }
   </style>
 </head>
 <body>
 
 <h1>Checkout</h1>
 
-<form action="https://formspree.io/f/xgooelka" method="POST">
+<div class="summary">
+  <div><strong id="itemTitle">Loading item…</strong></div>
+  <div class="muted" id="itemMeta"></div>
+  <div class="muted" style="margin-top:6px;" id="itemStock"></div>
+  <div class="muted" style="margin-top:10px;"><a href="/">← Back to Home</a></div>
+</div>
 
-  <!-- Customer info -->
+<form action="https://formspree.io/f/xgooelka" method="POST">
   <label>
     Name
     <input type="text" name="customer_name" required>
@@ -34,22 +42,54 @@
     <input type="text" name="zip" required pattern="[0-9]{5}">
   </label>
 
-  <!-- Order info (filled automatically) -->
+  <label>
+    Notes (optional)
+    <textarea name="notes" placeholder="Color requests, theme, etc."></textarea>
+  </label>
+
+  <!-- Product details -->
+  <input type="hidden" name="item_id" id="item_id">
   <input type="hidden" name="item_name" id="item_name">
-  <input type="hidden" name="customer_age" id="customer_age">
   <input type="hidden" name="stock_status" id="stock_status">
 
-  <!-- Optional redirect after submit -->
+  <!-- Redirect after submit -->
   <input type="hidden" name="_redirect" value="https://printedsmilesco.com/thanks.html">
 
-  <button type="submit">Buy</button>
+  <button type="submit">Send Order</button>
 </form>
 
+<script src="products.js"></script>
 <script>
-  const params = new URLSearchParams(window.location.search);
-  document.getElementById("item_name").value = params.get("name") || "Unknown Item";
-  document.getElementById("customer_age").value = params.get("age") || "Not provided";
-  document.getElementById("stock_status").value = params.get("stock") || "In Stock";
+  const params = new URLSearchParams(location.search);
+  const itemId = params.get("item");
+
+  const titleEl = document.getElementById("itemTitle");
+  const metaEl = document.getElementById("itemMeta");
+  const stockEl = document.getElementById("itemStock");
+
+  const hiddenId = document.getElementById("item_id");
+  const hiddenName = document.getElementById("item_name");
+  const hiddenStock = document.getElementById("stock_status");
+
+  const product = (window.PRODUCTS || []).find(p => p.id === itemId);
+
+  if(!itemId || !product){
+    titleEl.textContent = "Item not found";
+    metaEl.textContent = "Please go back and choose a product.";
+    stockEl.textContent = "";
+    hiddenId.value = itemId || "";
+    hiddenName.value = "Unknown item";
+    hiddenStock.value = "";
+  } else {
+    titleEl.textContent = product.name;
+    metaEl.textContent = (product.short || "") + (product.details ? " — " + product.details : "");
+    const stockText = product.inStock ? "In Stock" : "Out of Stock";
+    stockEl.textContent = "Status: " + stockText;
+
+    hiddenId.value = product.id;
+    hiddenName.value = product.name;
+    hiddenStock.value = stockText;
+  }
 </script>
 
 </body>
