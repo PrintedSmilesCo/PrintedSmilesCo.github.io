@@ -5,7 +5,7 @@
 window.PRODUCTS = [
   {
     id: "winter-exclusive", // use normal hyphen, not the long dash character
-    name: "Pine Cone Dragon - Winter Exclusive",
+    name: "Pine Cone Dragon - Winter Exclusive 100 Medallions",
     minAge: 3,
     maxAge: 99,
     inStock: true,
