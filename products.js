@@ -4,8 +4,8 @@
 
 window.PRODUCTS = [
   {
-    id: "winter-exclusive", // use normal hyphen, not the long dash character
-    name: "Pine Cone Dragon - Winter Exclusive 100 Medallions",
+    id: "winter-exclusive",
+    name: "Pine Cone Dragon - Winter Exclusive (100 Medallions)",
     minAge: 3,
     maxAge: 99,
     inStock: true,
@@ -13,17 +13,16 @@ window.PRODUCTS = [
     short: "Winter-exclusive flexi dragon.",
     details: "Articulated tail with flexible joints. Head turns right and left.",
     tags: ["dragon", "flexi"]
-  }
-
+  },
   {
-    id: "colorful-coral", // use normal hyphen, not the long dash character
-    name: "Aquarium coral",
+    id: "colorful-coral",
+    name: "Aquarium Coral",
     minAge: 3,
     maxAge: 99,
     inStock: true,
     image: "images/colorful-coral.jpeg",
     short: "Colorful and fun coral for your aquarium.",
-    details: "3-D Coral can be printed in various colors, shapes, and sizes",
-    tags: ["fish tank"]
+    details: "3-D coral can be printed in various colors, shapes, and sizes.",
+    tags: ["fish tank", "aquarium", "decor"]
   }
 ];
