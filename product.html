@@ -3,80 +3,194 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Item – Printed Smiles Co</title>
+  <title>Product – Printed Smiles Co</title>
+
   <style>
-    :root { --border:#e6e6e6; --text:#111; --muted:#666; }
-    body { font-family: Arial, sans-serif; margin: 0; color: var(--text); background:#fff; }
-    header { border-bottom: 1px solid var(--border); }
-    .wrap { max-width: 860px; margin: 0 auto; padding: 16px; }
-    a { color: inherit; }
-    .card { border:1px solid var(--border); border-radius: 12px; padding: 16px; }
-    .muted { color: var(--muted); }
-    .row { display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top: 14px; }
-    button { padding: 10px 12px; border:1px solid var(--border); background:#fff; border-radius: 8px; cursor:pointer; }
-    button.primary { border-color:#111; }
-    .stock { font-size: 14px; }
-    .ok { color:#0a7a2f; }
-    .no { color:#a10000; }
+    :root{
+      --border:#e6e6e6;
+      --text:#111;
+      --muted:#666;
+      --radius:16px;
+    }
+
+    body{
+      font-family: Arial, Helvetica, sans-serif;
+      margin:0;
+      color:var(--text);
+      background:#f7f6fb;
+    }
+
+    header{
+      border-bottom:1px solid var(--border);
+      background:#fff;
+    }
+
+    .wrap{
+      max-width:900px;
+      margin:0 auto;
+      padding:16px;
+    }
+
+    a{ color:inherit; }
+
+    .card{
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      padding:20px;
+      box-shadow:0 8px 18px rgba(0,0,0,0.08);
+    }
+
+    h1{
+      margin-top:0;
+    }
+
+    .muted{
+      color:var(--muted);
+    }
+
+    .product-image{
+      width:100%;
+      max-height:420px;
+      object-fit:cover;
+      border-radius:var(--radius);
+      border:1px solid var(--border);
+      margin:14px 0;
+    }
+
+    .stock.ok{ color:#0a7a2f; font-weight:800; }
+    .stock.no{ color:#a10000; font-weight:800; }
+
+    .info-box{
+      margin-top:16px;
+      padding:14px;
+      border-radius:12px;
+      background:#f2f4ff;
+      border:1px dashed #c7ccff;
+      font-size:14px;
+    }
+
+    .actions{
+      margin-top:18px;
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+
+    button{
+      padding:12px 16px;
+      border-radius:12px;
+      border:none;
+      background:#111;
+      color:#fff;
+      font-size:16px;
+      font-weight:700;
+      cursor:pointer;
+    }
+
+    button:disabled{
+      opacity:0.5;
+      cursor:not-allowed;
+    }
   </style>
 </head>
+
 <body>
 
 <header>
   <div class="wrap">
-    <a href="/">← Back</a>
+    <a href="index.html">← Back to Home</a>
   </div>
 </header>
 
 <main class="wrap">
   <div class="card">
-    <h1 id="name">Item</h1>
+    <h1 id="name">Loading…</h1>
     <p class="muted" id="ageRange"></p>
-    <p id="desc"></p>
-    <p class="stock" id="stock"></p>
 
-    <div class="row">
-      <button id="buyBtn" class="primary">Buy</button>
-      <span class="muted">Orders go to our email inbox.</span>
+    <!-- Product image -->
+    <img id="productImage" class="product-image" alt="" style="display:none;">
+
+    <!-- Description -->
+    <p id="desc" class="muted"></p>
+
+    <!-- Stock -->
+    <p id="stock"></p>
+
+    <!-- Production note -->
+    <div class="info-box">
+      Most products take from <strong>2 to 16 hours</strong> depending on color use and size.
+      If you need your item by a certain date, please specify in your order.
+    </div>
+
+    <div class="actions">
+      <button id="buyBtn">Buy</button>
+      <span class="muted">Orders are sent to our email inbox.</span>
     </div>
   </div>
 </main>
 
-<script src="products.js"></script>
+<!-- Load products -->
+<script src="products.js" defer></script>
+
 <script>
-  const params = new URLSearchParams(location.search);
-  const id = params.get("id");
-  const ageFromHome = params.get("age"); // may be blank
+  function renderProduct(){
+    const params = new URLSearchParams(location.search);
+    const id = params.get("id");
 
-  const p = (window.PRODUCTS || []).find(x => x.id === id);
+    const nameEl = document.getElementById("name");
+    const ageEl = document.getElementById("ageRange");
+    const descEl = document.getElementById("desc");
+    const stockEl = document.getElementById("stock");
+    const imgEl = document.getElementById("productImage");
+    const buyBtn = document.getElementById("buyBtn");
 
-  const nameEl = document.getElementById("name");
-  const ageEl = document.getElementById("ageRange");
-  const descEl = document.getElementById("desc");
-  const stockEl = document.getElementById("stock");
-  const buyBtn = document.getElementById("buyBtn");
+    const products = window.PRODUCTS;
 
-  if(!p){
-    nameEl.textContent = "Item not found";
-    ageEl.textContent = "";
-    descEl.textContent = "Go back and choose an item.";
-    stockEl.textContent = "";
-    buyBtn.disabled = true;
-  } else {
+    if (!Array.isArray(products)) {
+      nameEl.textContent = "Loading product…";
+      buyBtn.disabled = true;
+      return;
+    }
+
+    const p = products.find(x => x.id === id);
+
+    if (!p) {
+      nameEl.textContent = "Product not found";
+      descEl.textContent = "Please go back and select a product again.";
+      buyBtn.disabled = true;
+      return;
+    }
+
+    // Populate page
     nameEl.textContent = p.name;
-    const range = `${p.minAge}–${p.maxAge === 99 ? "+" : p.maxAge}`;
-    ageEl.textContent = `Recommended ages: ${range}`;
-    descEl.textContent = p.desc || "";
-    stockEl.textContent = p.inStock ? "In Stock" : "Out of Stock";
+    ageEl.textContent = `Recommended ages: ${p.minAge}–${p.maxAge === 99 ? "+" : p.maxAge}`;
+    descEl.textContent = p.details || p.short || "";
+
+    if (p.image) {
+      imgEl.src = p.image;
+      imgEl.alt = p.name;
+      imgEl.style.display = "block";
+    }
+
+    const stockText = p.inStock ? "In Stock" : "Out of Stock";
+    stockEl.textContent = stockText;
     stockEl.className = "stock " + (p.inStock ? "ok" : "no");
 
-    buyBtn.addEventListener("click", () => {
-      const age = ageFromHome || "";
-      const stock = p.inStock ? "In Stock" : "Out of Stock";
-      const url = `checkout.html?name=${encodeURIComponent(p.name)}&age=${encodeURIComponent(age)}&stock=${encodeURIComponent(stock)}`;
-      location.href = url;
-    });
+    buyBtn.disabled = !p.inStock;
+    buyBtn.onclick = () => {
+      location.href = `checkout.html?item=${encodeURIComponent(p.id)}`;
+    };
   }
+
+  // Initial load
+  window.addEventListener("DOMContentLoaded", () => {
+    setTimeout(renderProduct, 0);
+  });
+
+  // Fix browser Back button / bfcache
+  window.addEventListener("pageshow", renderProduct);
 </script>
 
 </body>
