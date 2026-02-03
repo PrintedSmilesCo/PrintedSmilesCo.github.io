@@ -26,3 +26,4 @@ window.PRODUCTS = [
     tags: ["fish tank", "aquarium", "decor"]
   }
 ];
+console.log("products.js loaded:", window.PRODUCTS?.length);
