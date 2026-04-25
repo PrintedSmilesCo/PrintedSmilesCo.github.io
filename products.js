@@ -33,7 +33,7 @@ window.PRODUCTS = [
     inStock: true,
     image: "images/BadSign.jpeg",
     short: "A silly sign to brighten someone's day.",
-    details: ""Approximately 4.5\" x 4.5\" and can be printed in various colors.",
+    details: "Approximately 4.5\" x 4.5\" and can be printed in various colors.",
     tags: ["decor"]
 }
 ];
