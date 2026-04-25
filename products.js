@@ -13,7 +13,7 @@ window.PRODUCTS = [
     short: "This sunken wreck can be a treasure for your fish.",
     details: "3-D submarine, approximately 5 inches long, can be printed in various colors.",
     tags: ["fish tank", "aquarium", "decor"]
-  }  
+  },
   {
     id: "colorful-coral",
     name: "Aquarium Coral",
